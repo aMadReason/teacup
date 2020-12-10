@@ -13,7 +13,7 @@ const store = {
     triggerEl: null,
   }),
   bgs: {
-    office: "bgs/jordan-grimmer-office2.jpg"
+    office: require("@/assets/jordan-grimmer-office2.jpg")
   },
   getLocation(key = this.state.game.activeLocationKey) {
     return this.state.game.getLocation({ key });
@@ -28,39 +28,73 @@ const store = {
     const player = this.getCharacter();
     return player ? player.things : [];
   },
-  actionButton({ key, noun, action = 'help', label = false }) {
-    return `<button class="button small" data-key="${key}" data-noun="${noun}" data-action="${action}">
-    ${label || noun}
+  actionButton({ key, noun, name = false, action = 'help', label = false }) {
+    return `<button class="button small" data-key="${key}" data-noun="${noun}" data-name="${name}" data-action="${action}">
+    ${label || name}
     </button>`;
   },
   singleCommand(attempt) {
-    const { text } = attempt;
-    if (text.toLowerCase() === 'view') this.state.view = !this.state.view;
-    if (text.toLowerCase() === 'menu') this.state.menu = !this.state.menu;
-    if (text.toLowerCase() === 'more') this.state.more = !this.state.more;
+    const { original } = attempt;
+    if (original.toLowerCase() === 'view') this.state.view = !this.state.view;
+    if (original.toLowerCase() === 'menu') this.state.menu = !this.state.menu;
+    if (original.toLowerCase() === 'more') this.state.more = !this.state.more;
 
   },
-  simpleCommand(attempt) {
-    const { res, actOnThing } = attempt;
-    const { key, noun } = actOnThing;
-    const actions = actOnThing.actionList;
+  replaceActions(attempt) {
+    const { res, actOnThings } = attempt;
+    const { key, noun, name, actionList } = actOnThings[0];
     let response = res();
-    actions.map(i => {
-      response = response.replace(i, this.actionButton({ key, noun, action: i, label: i }))
+    if (actOnThings.length === 1) {
+      actionList.map(i => {
+        response = response.replace(i, this.actionButton({ key, noun, name, action: i, label: i }))
+      });
+    }
+    return response;
+  },
+  replaceThings(attempt) {
+    const { res, actOnThings } = attempt;
+    let response = res();
+    actOnThings.map(i => {
+      response = response.replace(i.name, this.actionButton({
+        key: i.key,
+        noun: i.noun,
+        name: i.name,
+        action: 'help'
+      }))
     });
-    this.state.response = response;
+
+    return response;
   },
   command(str) {
-    const attempt = this.state.game.command(str);
+    const location = this.getLocation();
+    const attempt = this.state.game.command(str, {});
+    const { lAttempt, pAttempt } = attempt;
+    const lThings = lAttempt.actOnThings;
+    const pThings = pAttempt.actOnThings;
+
+    if (lAttempt.type === 'single') {
+      return this.singleCommand(lAttempt);
+    }
 
 
+    if (lThings.length > 0 && pThings.length > 0) {
+      const things = [...lThings, ...pThings];
+      return this.state.response = this.replaceThings({
+        res: () => `There is more than one '${lThings[0].noun}' available in the ${location.name} and inventory, please specify; ${things.map(i => i.name).join(', ')}.`,
+        actOnThings: things
+      });
+    }
 
-    // const loc = this.getLocation();
-    // const attempt = loc.tryAnd(str);
-    console.log(attempt)
+    if (lThings.length === 1 && pThings.length === 0) {
+      return this.state.response = this.replaceActions(lAttempt);
+    }
 
-    this.state.response = attempt.res();
+    if (pThings.length === 1 && lThings.length === 0) {
+      return this.state.response = this.replaceActions(pAttempt);
+    }
 
+    return this.state.response = this.replaceThings(lAttempt);
+    // this.state.response = attempt.res();
     // switch (attempt.type) {
     //   case 'error':
     //     this.state.response = attempt.res();

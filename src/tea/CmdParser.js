@@ -19,16 +19,15 @@ function cmdParser(input, lexicon = {}) {
     .first()
     .text();
 
-
-
   const verbs = doc.verbs().out("array");
-
   const nouns = doc.nouns().out("array");
   const action = verbs.find((i) => !i.includes("use")) || verbs[0] || "";
-  const output = doc.json();
-  const { terms = [], text = '' } = output[0];
+  const text = doc.text();
+  const terms = nlp(original, lexicon)
+    .normalize({ verbs: true }).json().map(i => i.text)
 
   const results = {
+    json: doc.json(),
     parts,
     action,
     actOn,
@@ -39,8 +38,6 @@ function cmdParser(input, lexicon = {}) {
     terms,
     original
   };
-
-
 
   return results;
 }

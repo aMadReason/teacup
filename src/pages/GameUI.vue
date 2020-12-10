@@ -126,18 +126,34 @@ export default {
       return this.moreOn === "locations";
     },
   },
+  watch: {
+    menu(newVal) {
+      if (newVal) {
+        store.state.triggerEl = document.activeElement;
+        this.focusables[0].focus();
+      }
+      if (!newVal) {
+        store.state.triggerEl.focus();
+        store.state.triggerEl = null;
+      }
+    },
+    more(newVal) {
+      if (newVal) {
+        store.state.triggerEl = document.activeElement;
+        this.$refs.closeMoreEl.focus();
+      }
+      if (!newVal) {
+        store.state.triggerEl.focus();
+        store.state.triggerEl = null;
+      }
+    },
+  },
   data: () => ({
     moreOn: "inventory",
   }),
   methods: {
-    toggleMore(e) {
+    toggleMore() {
       store.state.more = !store.state.more;
-      if (e && store.state.more === true) {
-        this.$refs.closeMoreEl.focus();
-      }
-      if (!store.state.more) {
-        this.$refs.toggleMoreEl.focus();
-      }
     },
     setMoreOn(flagName) {
       this.moreOn = flagName;
@@ -145,19 +161,8 @@ export default {
     toggleView() {
       store.state.view = !store.state.view;
     },
-    toggleMenu(e = null) {
+    toggleMenu() {
       store.state.menu = !store.state.menu;
-      const hasChildren = this.focusables.length > 0;
-
-      if (e && this.store.state === true && hasChildren) {
-        store.state.triggerEl = e.target;
-        this.focusables[0].focus();
-      }
-
-      if (store.state.triggerEl && !store.state.menu) {
-        store.state.triggerEl.focus();
-        store.state.triggerEl = null;
-      }
     },
     handleTab(e) {
       const target = e.target;
@@ -178,10 +183,10 @@ export default {
     },
     clickActionButton(e) {
       const { target } = e;
-      const noun = target.getAttribute("data-noun");
+      const name = target.getAttribute("data-name");
       const action = target.getAttribute("data-action");
-      if (!noun || !action) return;
-      store.command(`${action} ${noun}`);
+      if (!name || !action) return;
+      store.command(`${action} ${name}`);
     },
   },
 };

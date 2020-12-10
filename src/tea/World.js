@@ -1,9 +1,10 @@
 
-import Thing from './Thing'
+//import Thing from './Thing'
 
-class World extends Thing {
+
+
+class World {
   constructor(options) {
-    super(options);
     const {
       activeLocationKey = false,
       playerCharacterKey = false,
@@ -23,6 +24,7 @@ class World extends Thing {
     if (playerCharacterKey === false && characters.length > 0) {
       this.playerCharacterKey = characters[0].key;
     }
+
   }
 
   get player() {
@@ -63,36 +65,33 @@ class World extends Thing {
     const player = this.getCharacter();
     const pAttempt = player.tryAnd(str);
 
-    const inLocation = lAttempt.actOnThings.length;
-    const onPlayer = pAttempt.actOnThings.length;
+    // const inLocation = lAttempt.actOnThings.length;
+    // const onPlayer = pAttempt.actOnThings.length;
 
 
-    if (inLocation > 0 && onPlayer === 0) {
-      return lAttempt;
-    }
-
-    if (inLocation === 0 && onPlayer > 0) {
-      return pAttempt;
-    }
-
-    if (inLocation > 0 && onPlayer > 0) {
-      const fLoc = lAttempt.actOnThings[0]
-      lAttempt.res = () => fLoc.errs.multiMatch({
-        me: location,
-        data: {
-          all: true,
-          noun: fLoc.noun,
-          things: [...lAttempt.actOnThings, ...pAttempt.actOnThings]
-        }
-      })
-    }
-
-    // if (pAttempt.actOnThings.length > 1) {
-    //   console.log(`Please specify what type of '${pAttempt.actOn}', the following are in the inventory; ${pAttempt.actOnThings.map(i => i.fullname).join(', ')}.`);
+    // if (inLocation > 0 && onPlayer === 0) {
+    //   return lAttempt;
     // }
 
-    console.log()
-    return lAttempt;
+    // if (inLocation === 0 && onPlayer > 0) {
+    //   return pAttempt;
+    // }
+
+    // if (inLocation > 0 && onPlayer > 0) {
+    //   const lLoc = lAttempt.actOnThings[0];
+    //   lAttempt.res = () => {
+    //     let msg = `There is more than one '${lLoc.noun}'. `;
+    //     msg += `In the '${location.name}'; ${lAttempt.actOnThings.map(i => i.name).join(', ')}. `;
+    //     msg += `In the inventory; ${pAttempt.actOnThings.map(i => i.name).join(", ")}`;
+    //     lAttempt.actOnThings = [...lAttempt.actOnThings, ...pAttempt.actOnThings];
+    //     return msg;
+    //   }
+    // }
+
+    return {
+      lAttempt,
+      pAttempt
+    };
 
   }
 }

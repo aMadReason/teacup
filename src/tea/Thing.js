@@ -1,4 +1,4 @@
-import cmdParser from "../CmdParser";
+import cmdParser from "./CmdParser";
 import {
   initialProps,
   initialActs,
@@ -28,7 +28,7 @@ class Thing {
     this.ennumKey = ennumKey;
     this.errs = { ...initialErrs, errs };
     this.subs = { ...initialSubs, ...subs };
-    this.isPlayer = isPlayer;
+    this.isPlayer = isPlayer; //  used by world
   }
 
   get name() {
@@ -91,19 +91,19 @@ class Thing {
     return this.sub(result);
   }
 
-  parse(command) {
-    return cmdParser(command);
+  parse(command, lexicon = {}) {
+    return cmdParser(command, lexicon);
   }
 
-  tryAnd(command) {
+  tryAnd(command, lexicon = {}) {
     if (!command) return;
-    const parsed = this.parse(command);
+    const parsed = this.parse(command, lexicon);
     const { nouns, action, actOn, actWith, terms } = parsed;
 
     let type = "empty";
     let res = () => "unknown";
 
-    if (terms.length === 1) type = "single";
+    if (terms && terms.length === 1) type = "single";
     if (actOn && action && !actWith) type = "simple";
     if (actOn && action && actWith) type = "complex";
 
@@ -111,8 +111,10 @@ class Thing {
     const actWithThings = actWith ? this.findThings(actWith) : false;
     const act = action ? this.findThings(action) : false;
 
+    console.log(terms)
+
     if (type === "single") {
-      const singleTxt = terms[0].text;
+      const singleTxt = terms[0];
       const singleAct = this.getAction(singleTxt);
       res = () => this.sub(this.errs.noAction(this, { action: singleTxt }));
       if (singleAct) {

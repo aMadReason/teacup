@@ -45,9 +45,13 @@ const appleYellow = new Thing({
   noun: 'apple',
   fullname: 'yellow apple'
 });
+const hat = new Thing({
+  noun: 'hat',
+  fullname: 'hat'
+});
 const player = new Thing({ key: 'player', noun: 'player' });
 office.addThing(appleYellow)
-player.addThing(appleRed).addThing(appleGreen);
+player.addThing(appleRed).addThing(appleGreen).addThing(hat);
 const characters = [player];
 
 

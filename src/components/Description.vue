@@ -11,10 +11,11 @@ export default {
     rawHtml() {
       let description = this.thing.callAction("describe");
       const button = store.actionButton({
+        name: this.thing.name,
         noun: this.thing.noun,
         key: this.thing.key,
       });
-      description = description.replace(this.thing.noun, button);
+      description = description.replace(this.thing.name, button);
       return description;
     },
   },
