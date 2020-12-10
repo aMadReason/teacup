@@ -56,8 +56,10 @@ export default {
   data: () => ({}),
   mounted: function () {
     /* eslint-disable */
+    const office = require("@/assets/jordan-grimmer-office2.jpg");
+
     this.bgs = {
-      office: require("@/assets/jordan-grimmer-office2.jpg"),
+      office,
     };
     /* eslint-enable */
     this.$refs.bg.style.backgroundImage = `url(${this.bgs.office})`;

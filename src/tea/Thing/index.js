@@ -16,7 +16,8 @@ class Thing {
     things = [],
     ennumKey = "default",
     subs = {},
-    errs = {}
+    errs = {},
+    isPlayer = false,
   }) {
     this.key = key || fullname || noun;
     this.noun = noun;
@@ -27,6 +28,7 @@ class Thing {
     this.ennumKey = ennumKey;
     this.errs = { ...initialErrs, errs };
     this.subs = { ...initialSubs, ...subs };
+    this.isPlayer = isPlayer;
   }
 
   get name() {
@@ -34,13 +36,22 @@ class Thing {
   }
 
   get actionList() {
-    return Object.keys(this.actions);
+    return [...Object.keys(this.actions)];
   }
 
   get thingList() {
     return this.things.map((i) => i.name);
   }
 
+  get p() {
+    return this.props;
+  }
+
+  /**
+   * Substitutions used in props, actions and errors
+   * @param {String} str 
+   * @param {Object} subs 
+   */
   sub(str, subs = this.subs) {
     if (typeof str !== "string") return null;
     Object.keys(subs).map((i) => (str = str.replace(i, subs[i]({ me: this }))));
@@ -50,11 +61,14 @@ class Thing {
   addThing(thing) {
     if (thing instanceof Thing === false) return null;
     this.things.push(thing);
+    return this;
   }
 
-  getThing(word) {
-    const thing = [...this.things, this].find((i) => i.name === word);
-    return thing;
+  findThings(word) {
+    const things = [...this.things, this].filter((i) => {
+      return [i.fullname, i.noun, i.key].includes(word);
+    });
+    return things;
   }
 
   getThings() {
@@ -93,9 +107,9 @@ class Thing {
     if (actOn && action && !actWith) type = "simple";
     if (actOn && action && actWith) type = "complex";
 
-    const actOnThing = actOn ? this.getThing(actOn) : false;
-    const actWithThing = actWith ? this.getThing(actWith) : false;
-    const act = action ? this.getAction(action) : false;
+    const actOnThings = actOn ? this.findThings(actOn) : false;
+    const actWithThings = actWith ? this.findThings(actWith) : false;
+    const act = action ? this.findThings(action) : false;
 
     if (type === "single") {
       const singleTxt = terms[0].text;
@@ -107,17 +121,24 @@ class Thing {
     }
 
     if (type === "simple") {
-      res = () => initialErrs.noThingSimple(this, { noun: nouns[0] });
-      if (actOnThing) {
-        res = () => actOnThing.callAction(action);
+      if (actOnThings && actOnThings.length === 0) {
+        type = 'error';
+        res = () => this.errs.noThingSimple({ me: this, data: { noun: nouns[0], actOn } });
+      }
+      if (actOnThings && actOnThings.length > 1) {
+        type = 'error';
+        res = () => this.sub(this.errs.multiMatch({ me: this, data: { noun: nouns[0], things: actOnThings } }))
+      }
+      if (actOnThings && actOnThings.length === 1) {
+        res = () => actOnThings[0].callAction(action);
       }
     }
 
     return {
       res,
       type,
-      actOnThing,
-      actWithThing,
+      actOnThings,
+      actWithThings,
       act,
       ...parsed
     };

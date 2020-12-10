@@ -19,9 +19,6 @@ export default {
     },
   },
   data: () => ({}),
-  mounted() {
-    console.log(this.thing);
-  },
 };
 </script>
 

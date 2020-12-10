@@ -1,6 +1,6 @@
 <template>
   <div class="commander-input">
-    <form>
+    <form @submit.prevent="cmd">
       <label for="cmd">Command:</label>
       <div class="commander-inputgroup">
         <input class="input" v-model="inputCommand" id="cmd" type="text" />
@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import store from "../store";
 export default {
   name: "Commander",
   emits: ["command", "toggleview"],
@@ -29,6 +30,12 @@ export default {
   data: () => ({
     inputCommand: "",
   }),
+  methods: {
+    cmd() {
+      store.command(this.inputCommand);
+      this.inputCommand = "";
+    },
+  },
 };
 </script>
 
@@ -49,7 +56,7 @@ export default {
 .commander-input .commander-controls,
 .commander-input .commander-inputgroup {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
 }
 
 .commander-input .commander-inputgroup button,

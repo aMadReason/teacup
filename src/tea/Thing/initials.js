@@ -14,10 +14,19 @@ export const initialActs = {
 };
 
 export const initialErrs = {
-  noThingSimple: ({ me, data }) => `There is no '${data.noun}' in the ${me.name}.`,
+  noThingSimple: ({ me, data }) => `There is no '${data.actOn || data.noun}' in the ${me.name}.`,
   noAction: ({ data }) =>
     `The '${data.action}' action is not available for the [name].`,
-  noNoun: () => "Commands should have at least a single noun."
+  noNoun: () => "Commands should have at least a single noun.",
+  multiMatch: ({ me, data }) => {
+    if (me.isPlayer === true) {
+      return `There is more than one '${data.noun}' in the inventory, please specify which: ${data.things.map(i => `'${i.name}'`).join(', ')}.`
+    }
+    if (data.all === true) {
+      return `There is more than one '${data.noun}' in the ${me.name} and inventory, please specify which: ${data.things.map(i => `'${i.name}'`).join(', ')}.`
+    }
+    return `There is more than one '${data.noun}' in the [name], please specify which: ${data.things.map(i => `'${i.name}'`).join(', ')}.`
+  }
 };
 
 export const initialSubs = {

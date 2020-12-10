@@ -1,29 +1,20 @@
 import { reactive } from 'vue';
 
-import game from './game';
+import office from './game/office';
 
 const store = {
   debug: true,
   state: reactive({
-    game,
+    activeLocationKey: office.key,
+    locations: [office],
     response: 'Command responses will display here when submitted.',
     more: false,
     view: true,
     menu: false,
     triggerEl: null,
   }),
-  getLocation(key = this.state.game.activeLocationKey) {
-    return this.state.game.getLocation({ key });
-  },
-  getCharacter(key) {
-    return this.state.game.getCharacter({ key });
-  },
-  getLocations() {
-    return this.state.game.locations;
-  },
-  getInventory() {
-    const player = this.getCharacter();
-    return player ? player.things : [];
+  getLocation(key = this.state.activeLocationKey) {
+    return this.state.locations.find((i) => i.key === key);
   },
   actionButton({ key, noun, action = 'help', label = false }) {
     return `<button class="button small" data-key="${key}" data-noun="${noun}" data-action="${action}">
@@ -32,6 +23,7 @@ const store = {
   },
   singleCommand(attempt) {
     const { text } = attempt;
+    console.log(attempt)
     if (text.toLowerCase() === 'view') this.state.view = !this.state.view;
     if (text.toLowerCase() === 'menu') this.state.menu = !this.state.menu;
     if (text.toLowerCase() === 'more') this.state.more = !this.state.more;
@@ -48,27 +40,18 @@ const store = {
     this.state.response = response;
   },
   command(str) {
-    const attempt = this.state.game.command(str);
+    const loc = this.getLocation();
+    const attempt = loc.tryAnd(str);
+    //console.log(attempt)
 
-
-
-    // const loc = this.getLocation();
-    // const attempt = loc.tryAnd(str);
-    console.log(attempt)
-
-    this.state.response = attempt.res();
-
-    // switch (attempt.type) {
-    //   case 'error':
-    //     this.state.response = attempt.res();
-    //     break;
-    //   case 'simple':
-    //     this.simpleCommand(attempt)
-    //     break;
-    //   case 'single':
-    //     this.singleCommand(attempt)
-    //     break;
-    // }
+    switch (attempt.type) {
+      case 'simple':
+        this.simpleCommand(attempt)
+        break;
+      case 'single':
+        this.singleCommand(attempt)
+        break;
+    }
 
   }
 };

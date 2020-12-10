@@ -13,17 +13,21 @@ function cmdParser(input, lexicon = {}) {
     .match("#Adjective?+ #Noun")
     .first()
     .text();
+
   const actWith = nlp(otherPart, lexicon)
     .match("#Adjective?+ #Noun")
     .first()
     .text();
 
+
+
   const verbs = doc.verbs().out("array");
+
   const nouns = doc.nouns().out("array");
   const action = verbs.find((i) => !i.includes("use")) || verbs[0] || "";
-
   const output = doc.json();
-  const { terms, text } = output[0];
+  const { terms = [], text = '' } = output[0];
+
   const results = {
     parts,
     action,
@@ -35,6 +39,8 @@ function cmdParser(input, lexicon = {}) {
     terms,
     original
   };
+
+
 
   return results;
 }

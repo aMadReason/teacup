@@ -36,17 +36,44 @@
             </Commander>
           </template>
           <template v-slot:response>
-            <Response />
+            <Response :response="response" />
           </template>
         </Scene>
       </template>
       <template v-slot:right>
         <div class="menu full-height full-width">
           <div class="titlebar">
-            <div class="title-text">hi</div>
+            <div class="title-text more">
+              <button
+                class="button"
+                :aria-pressed="inventoryOn"
+                @click="setMoreOn('inventory')"
+              >
+                Inventory
+              </button>
+              <button
+                class="button"
+                :aria-pressed="locationsOn"
+                @click="setMoreOn('locations')"
+              >
+                Locations
+              </button>
+            </div>
             <button ref="closeMoreEl" @click="toggleMore" class="button icon">
               X
             </button>
+          </div>
+
+          <div v-if="locationsOn">
+            <ul>
+              <li v-for="l in locations" :key="l.key">{{ l.name }}</li>
+            </ul>
+          </div>
+
+          <div v-if="inventoryOn">
+            <ul>
+              <li v-for="item in inventory" :key="item.key">{{ item.name }}</li>
+            </ul>
           </div>
         </div>
       </template>
@@ -73,47 +100,63 @@ export default {
   },
   props: [],
   computed: {
+    view: () => store.state.view,
+    more: () => store.state.more,
+    menu: () => store.state.menu,
+    triggerEl: () => store.state.triggerEl,
     focusables() {
       return this.getFocusables("menuEl");
     },
     location() {
       return store.getLocation();
     },
+    locations() {
+      return store.getLocations();
+    },
+    inventory() {
+      return store.getInventory();
+    },
     response() {
-      return store.response;
+      return store.state.response;
+    },
+    inventoryOn() {
+      return this.moreOn === "inventory";
+    },
+    locationsOn() {
+      return this.moreOn === "locations";
     },
   },
   data: () => ({
-    more: false,
-    view: true,
-    menu: false,
-    triggerEl: null,
+    moreOn: "inventory",
   }),
   methods: {
     toggleMore(e) {
-      this.more = !this.more;
-      if (e && this.more === true) {
+      store.state.more = !store.state.more;
+      if (e && store.state.more === true) {
         this.$refs.closeMoreEl.focus();
       }
-      if (!this.more) {
+      if (!store.state.more) {
         this.$refs.toggleMoreEl.focus();
       }
     },
+    setMoreOn(flagName) {
+      this.moreOn = flagName;
+    },
     toggleView() {
-      this.view = !this.view;
+      store.state.view = !store.state.view;
     },
     toggleMenu(e = null) {
-      this.menu = !this.menu;
+      store.state.menu = !store.state.menu;
       const hasChildren = this.focusables.length > 0;
 
-      if (e && this.menu === true && hasChildren) {
-        this.triggerEl = e.target;
+      if (e && this.store.state === true && hasChildren) {
+        store.state.triggerEl = e.target;
         this.focusables[0].focus();
       }
 
-      if (this.triggerEl && !this.menu) {
-        this.triggerEl.focus();
-        this.triggerEl = null;
+      if (store.state.triggerEl && !store.state.menu) {
+        store.state.triggerEl.focus();
+        store.state.triggerEl = null;
       }
     },
     handleTab(e) {
@@ -160,5 +203,13 @@ export default {
 
 .titlebar .title-text {
   flex-basis: 100%;
+}
+
+.titlebar .title-text.more {
+  display: flex;
+}
+
+button[aria-pressed="true"] {
+  text-decoration: underline;
 }
 </style>
