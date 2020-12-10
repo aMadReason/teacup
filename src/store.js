@@ -12,6 +12,9 @@ const store = {
     menu: false,
     triggerEl: null,
   }),
+  bgs: {
+    office: "bgs/jordan-grimmer-office2.jpg"
+  },
   getLocation(key = this.state.game.activeLocationKey) {
     return this.state.game.getLocation({ key });
   },
