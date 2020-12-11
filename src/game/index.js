@@ -47,7 +47,16 @@ const appleYellow = new Thing({
 });
 const hat = new Thing({
   noun: 'hat',
-  fullname: 'hat'
+  fullname: 'hat',
+  actions: {
+    drop: ({ me }) => {
+      const { world } = me;
+      // const location = world.getLocation();
+      // const player = world.getCharter('player');
+
+      return `${me.name} ${world.name}`
+    }
+  }
 });
 const player = new Thing({ key: 'player', noun: 'player' });
 office.addThing(appleYellow)

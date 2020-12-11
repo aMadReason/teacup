@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import GameUI from "./pages/GameUI.vue";
+import GameUI from "./components/GameUI.vue";
 export default {
   name: "App",
   components: {

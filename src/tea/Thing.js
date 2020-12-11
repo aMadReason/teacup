@@ -18,6 +18,7 @@ class Thing {
     subs = {},
     errs = {},
     isPlayer = false,
+    world = false
   }) {
     this.key = key || fullname || noun;
     this.noun = noun;
@@ -28,6 +29,7 @@ class Thing {
     this.ennumKey = ennumKey;
     this.errs = { ...initialErrs, errs };
     this.subs = { ...initialSubs, ...subs };
+    this.world = world;
     this.isPlayer = isPlayer; //  used by world
   }
 
@@ -85,7 +87,7 @@ class Thing {
 
   callAction(key, data = {}) {
     const cb = this.actions[key];
-    if (!cb) return this.sub(this.errs.noAction(this, { action: key }));
+    if (!cb) return this.sub(this.errs.noAction({ data: { action: key } }));
     if (typeof cb !== "function") return cb;
     const result = cb({ me: this, data });
     return this.sub(result);

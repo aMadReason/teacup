@@ -61,9 +61,9 @@ class World {
 
   command(str) {
     const location = this.getLocation();
-    const lAttempt = location.tryAnd(str);
+    const lAttempt = location.tryAnd(str, this);
     const player = this.getCharacter();
-    const pAttempt = player.tryAnd(str);
+    const pAttempt = player.tryAnd(str, this);
 
     // const inLocation = lAttempt.actOnThings.length;
     // const onPlayer = pAttempt.actOnThings.length;

@@ -25,7 +25,8 @@ const store = {
     return this.state.game.locations;
   },
   getInventory() {
-    const player = this.getCharacter();
+    const player = this.getCharacter('player');
+    console.log(player)
     return player ? player.things : [];
   },
   actionButton({ key, noun, name = false, action = 'help', label = false }) {
@@ -38,7 +39,7 @@ const store = {
     if (original.toLowerCase() === 'view') this.state.view = !this.state.view;
     if (original.toLowerCase() === 'menu') this.state.menu = !this.state.menu;
     if (original.toLowerCase() === 'more') this.state.more = !this.state.more;
-
+    if (original.toLowerCase() === 'clear') this.state.response = '';
   },
   replaceActions(attempt) {
     const { res, actOnThings } = attempt;

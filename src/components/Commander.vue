@@ -3,7 +3,14 @@
     <form @submit.prevent="cmd">
       <label for="cmd">Command:</label>
       <div class="commander-inputgroup">
-        <input class="input" v-model="inputCommand" id="cmd" type="text" />
+        <input
+          autocomplete="on"
+          class="input"
+          @keyup.ctrl.c="clearResponse"
+          v-model="inputCommand"
+          id="cmd"
+          type="text"
+        />
         <button class="button" type="submit">Submit</button>
       </div>
     </form>
@@ -34,6 +41,9 @@ export default {
     cmd() {
       store.command(this.inputCommand);
       this.inputCommand = "";
+    },
+    clearResponse() {
+      store.state.response = "";
     },
   },
 };
