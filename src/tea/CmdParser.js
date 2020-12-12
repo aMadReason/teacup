@@ -2,9 +2,12 @@ import nlp from "compromise";
 
 function cmdParser(input, lexicon = {}) {
   const original = input.toLowerCase().replace(/\.+$/, "");
-  let doc = nlp(original, lexicon)
+  console.log(original, lexicon)
+  const doc = nlp(original, lexicon)
     .normalize({ verbs: true })
     .match("(#Verb|#Noun) .?+");
+
+
 
   const parts = doc.clone().splitAfter("#Noun").out("array");
   const mainPart = parts.find((i) => !i.includes("use")) || parts[0];

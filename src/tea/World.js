@@ -4,66 +4,59 @@
 
 
 class World {
-  constructor(options) {
-    const {
-      activeLocationKey = false,
-      playerCharacterKey = false,
-      locations = [],
-      characters = []
-    } = options;
-
-    this.activeLocationKey = activeLocationKey;
-    this.playerCharacterKey = playerCharacterKey;
-    this.locations = locations;
-    this.characters = characters;
-
-    if (activeLocationKey === false && locations.length > 0) {
-      this.activeLocationKey = locations[0].key;
-    }
-
-    if (playerCharacterKey === false && characters.length > 0) {
-      this.playerCharacterKey = characters[0].key;
-    }
-
+  constructor() {
+    this.activeLocationKey = null;
+    this.playerCharacterKey = null;
+    this.locations = [];
+    this.characters = [];
   }
 
   get player() {
-    return this.characters.find(i => i.isPlayer === true);
+    return this.characters.find(i => i.key === this.playerCharacterKey);
   }
 
   setPlayer(key) {
-    const current = this.getCharacter();
     const toBe = this.getCharacter({ key });
     if (!toBe) throw Error('Character not found.');
-    this.characters.forEach(c => c.isPlayer = false);
-    toBe.isPlayer = true;
-    this.playerCharacterKey = toBe ? toBe.key : current.key;
-    return this;
+    // this.characters.forEach(c => c.isPlayer = false);
+    // toBe.isPlayer = true;
+    this.playerCharacterKey = toBe.key;
   }
 
-  add(type, thing) {
-    if (!['character', 'locations'].includes(type)) return;
-    this[type].push(thing);
-    return this;
+  addLocation(thing) {
+    thing.world = this;
+    this.locations.push(thing);
+    if (!this.activeLocationKey && this.locations.length === 1) {
+      this.activeLocationKey = thing.key;
+    }
   }
-  getLocation({ name, key } = { name: false, key: this.activeLocationKey }) {
-    const location = this.locations.find(l => {
-      return l.key === key || l.name === name
-    });
+
+  getLocation(key = this.activeLocationKey) {
+    console.log(key)
+    const location = this.locations.find(l => l.key === key);
     return location;
   }
-  getCharacter({ name, key } = { name: false, key: this.playerCharacterKey }) {
-    const character = this.characters.find(c => {
-      return c.key === key || c.name === name
-    });
+
+  addCharacter(thing) {
+    thing.world = this;
+    this.characters.push(thing);
+    if (!this.playerCharacterKey && this.characters.length === 1) {
+      this.playerCharacterKey = thing.key;
+    }
+  }
+
+  getCharacter(key = this.playerCharacterKey) {
+    console.log(key)
+    const character = this.characters.find(c => c.key === key);
     return character;
   }
 
   command(str) {
+
     const location = this.getLocation();
-    const lAttempt = location.tryAnd(str, this);
+    const lAttempt = location.tryAnd(str);
     const player = this.getCharacter();
-    const pAttempt = player.tryAnd(str, this);
+    const pAttempt = player.tryAnd(str);
 
     // const inLocation = lAttempt.actOnThings.length;
     // const onPlayer = pAttempt.actOnThings.length;

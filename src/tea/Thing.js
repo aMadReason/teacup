@@ -17,8 +17,8 @@ class Thing {
     ennumKey = "default",
     subs = {},
     errs = {},
-    isPlayer = false,
-    world = false
+    world = false,
+    parent = false
   }) {
     this.key = key || fullname || noun;
     this.noun = noun;
@@ -30,7 +30,8 @@ class Thing {
     this.errs = { ...initialErrs, errs };
     this.subs = { ...initialSubs, ...subs };
     this.world = world;
-    this.isPlayer = isPlayer; //  used by world
+    this.parent = parent;
+
   }
 
   get name() {
@@ -62,6 +63,8 @@ class Thing {
 
   addThing(thing) {
     if (thing instanceof Thing === false) return null;
+    thing.parent = this;
+    thing.world = this.world;
     this.things.push(thing);
     return this;
   }
@@ -113,7 +116,7 @@ class Thing {
     const actWithThings = actWith ? this.findThings(actWith) : false;
     const act = action ? this.findThings(action) : false;
 
-    console.log(terms)
+    console.log('four')
 
     if (type === "single") {
       const singleTxt = terms[0];

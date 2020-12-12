@@ -1,11 +1,11 @@
 import { reactive } from 'vue';
 
-import game from './game';
+import data from './data';
 
 const store = {
   debug: true,
   state: reactive({
-    game,
+    game: data,
     response: 'Command responses will display here when submitted.',
     more: false,
     view: true,
@@ -16,17 +16,16 @@ const store = {
     office: require("@/assets/jordan-grimmer-office2.jpg")
   },
   getLocation(key = this.state.game.activeLocationKey) {
-    return this.state.game.getLocation({ key });
+    return this.state.game.getLocation(key);
   },
-  getCharacter(key) {
-    return this.state.game.getCharacter({ key });
+  getCharacter(key = this.state.game.playerCharacterKey) {
+    return this.state.game.getCharacter(key);
   },
   getLocations() {
     return this.state.game.locations;
   },
   getInventory() {
     const player = this.getCharacter('player');
-    console.log(player)
     return player ? player.things : [];
   },
   actionButton({ key, noun, name = false, action = 'help', label = false }) {
@@ -72,6 +71,8 @@ const store = {
     const { lAttempt, pAttempt } = attempt;
     const lThings = lAttempt.actOnThings;
     const pThings = pAttempt.actOnThings;
+
+
 
     if (lAttempt.type === 'single') {
       return this.singleCommand(lAttempt);
