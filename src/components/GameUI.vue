@@ -19,7 +19,7 @@
             <button @click="toggleMenu" class="button">Menu</button>
             <div class="title-text">
               <h1 class="text-center">
-                {{ location.name }}
+                {{ game.location.name }}
               </h1>
             </div>
           </div>
@@ -66,13 +66,17 @@
 
           <div v-if="locationsOn">
             <ul>
-              <li v-for="l in locations" :key="l.key">{{ l.name }}</li>
+              <li v-for="l in game.locations" :key="l.key">
+                {{ l.name }}
+              </li>
             </ul>
           </div>
 
           <div v-if="inventoryOn">
             <ul>
-              <li v-for="item in inventory" :key="item.key">{{ item.name }}</li>
+              <li v-for="item in game.player.things" :key="item.key">
+                {{ item.name }}
+              </li>
             </ul>
           </div>
         </div>
@@ -107,15 +111,15 @@ export default {
     focusables() {
       return this.getFocusables("menuEl");
     },
-    location() {
-      return store.getLocation();
-    },
-    locations() {
-      return store.getLocations();
-    },
-    inventory() {
-      return store.getInventory();
-    },
+    // location() {
+    //   return this.sharedState.game.getLocation();
+    // },
+    // locations() {
+    //   return store.getLocations();
+    // },
+    // inventory() {
+    //   return store.getInventory();
+    // },
     response() {
       return store.state.response;
     },
@@ -126,6 +130,10 @@ export default {
       return this.moreOn === "locations";
     },
   },
+  data: () => ({
+    moreOn: "inventory",
+    game: store.game,
+  }),
   watch: {
     menu(newVal) {
       if (newVal) {
@@ -148,9 +156,6 @@ export default {
       }
     },
   },
-  data: () => ({
-    moreOn: "inventory",
-  }),
   methods: {
     toggleMore() {
       store.state.more = !store.state.more;

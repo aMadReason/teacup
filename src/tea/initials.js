@@ -8,12 +8,13 @@ export const initialProps = () => ({
 });
 
 export const initialActs = {
-  examine: ({ me }) => me.props.details[me.ennumKey],
-  describe: ({ me }) => me.props.descriptions[me.ennumKey],
+  examine: ({ me }) => me.p.details[me.stateKey] || me.p.details.default,
+  describe: ({ me }) => me.p.descriptions[me.stateKey] || me.p.descriptions.default,
   help: () => "The following actions can be used on the [name]: [actions]"
 };
 
 export const initialErrs = {
+  empty: () => `Please enter something`,
   noThingSimple: ({ me, data }) => `There is no '${data.actOn || data.noun}' in the ${me.name}.`,
   noAction: ({ data }) =>
     `The '${data.action}' action is not available for the [name].`,

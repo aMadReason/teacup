@@ -14,7 +14,7 @@ class Thing {
     props = {},
     actions = {},
     things = [],
-    ennumKey = "default",
+    stateKey = "default",
     subs = {},
     errs = {},
     world = false,
@@ -26,7 +26,7 @@ class Thing {
     this.props = { ...initialProps(), ...props };
     this.actions = { ...initialActs, ...actions };
     this.things = [...things];
-    this.ennumKey = ennumKey;
+    this.stateKey = stateKey;
     this.errs = { ...initialErrs, errs };
     this.subs = { ...initialSubs, ...subs };
     this.world = world;
@@ -50,6 +50,17 @@ class Thing {
     return this.props;
   }
 
+  get a() {
+    return this.actions
+  }
+
+  get description() {
+    return this.sub(this.props.descriptions[this.stateKey]);
+  }
+
+  get detail() {
+    return this.sub(this.props.details[this.stateKey]);
+  }
   /**
    * Substitutions used in props, actions and errors
    * @param {String} str 
@@ -61,12 +72,24 @@ class Thing {
     return str;
   }
 
+  removeThing(key) {
+    const thing = this.findThing(key);
+    if (thing) {
+      this.things = this.things.filter(i => i.key !== key);
+    }
+    return thing;
+  }
+
   addThing(thing) {
     if (thing instanceof Thing === false) return null;
     thing.parent = this;
     thing.world = this.world;
     this.things.push(thing);
     return this;
+  }
+
+  findThing(key) {
+    return this.things.find(i => i.key === key)
   }
 
   findThings(word) {
@@ -116,7 +139,10 @@ class Thing {
     const actWithThings = actWith ? this.findThings(actWith) : false;
     const act = action ? this.findThings(action) : false;
 
-    console.log('four')
+    if (type === 'empty') {
+      type = 'error';
+      res = () => this.errs.empty();
+    }
 
     if (type === "single") {
       const singleTxt = terms[0];

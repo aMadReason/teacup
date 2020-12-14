@@ -9,18 +9,32 @@ class World {
     this.playerCharacterKey = null;
     this.locations = [];
     this.characters = [];
+    this.lexicon = {};
   }
 
   get player() {
-    return this.characters.find(i => i.key === this.playerCharacterKey);
+    return this.getCharacter();
+  }
+
+  get location() {
+    return this.getLocation();
+  }
+
+  setLexicon(lexicon) {
+    this.lexicon = { ...lexicon };
+    return this;
   }
 
   setPlayer(key) {
     const toBe = this.getCharacter({ key });
     if (!toBe) throw Error('Character not found.');
-    // this.characters.forEach(c => c.isPlayer = false);
-    // toBe.isPlayer = true;
     this.playerCharacterKey = toBe.key;
+  }
+
+  setLocation(key) {
+    const toBe = this.getLocation(key);
+    if (!toBe) throw Error('Location not found.');
+    this.activeLocationKey = toBe.key;
   }
 
   addLocation(thing) {
@@ -32,7 +46,6 @@ class World {
   }
 
   getLocation(key = this.activeLocationKey) {
-    console.log(key)
     const location = this.locations.find(l => l.key === key);
     return location;
   }
@@ -46,17 +59,15 @@ class World {
   }
 
   getCharacter(key = this.playerCharacterKey) {
-    console.log(key)
     const character = this.characters.find(c => c.key === key);
     return character;
   }
 
-  command(str) {
-
+  command(str, lexicon) {
     const location = this.getLocation();
-    const lAttempt = location.tryAnd(str);
+    const lAttempt = location.tryAnd(str, lexicon || this.lexicon);
     const player = this.getCharacter();
-    const pAttempt = player.tryAnd(str);
+    const pAttempt = player.tryAnd(str, lexicon || this.lexicon);
 
     // const inLocation = lAttempt.actOnThings.length;
     // const onPlayer = pAttempt.actOnThings.length;

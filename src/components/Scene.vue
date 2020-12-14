@@ -2,13 +2,21 @@
   <div v-bind:data-view="view" class="scene">
     <slot></slot>
     <div class="description">
-      <div class="bg" ref="bg" role="presentation" aria-hidden></div>
+      <div
+        class="bg"
+        ref="bg"
+        role="presentation"
+        aria-hidden
+        :style="{
+          backgroundImage: `url(${bgs[game.activeLocationKey]})`,
+        }"
+      ></div>
       <div class="corpus box">
-        {{ description }}
+        {{ game.location.description }}
       </div>
       <div class="items box">
         <ul class="unstyled">
-          <li v-for="thing in things" v-bind:key="thing.key">
+          <li v-for="thing in game.location.things" v-bind:key="thing.key">
             <Description v-bind:thing="thing" />
             <!-- {{ thing.callAction("describe") }} -->
           </li>
@@ -41,22 +49,31 @@ export default {
     view: { type: Boolean, default: true },
   },
   computed: {
-    location() {
-      return store.getLocation();
-    },
-    description() {
-      const loc = store.getLocation();
-      return loc.callAction("describe");
-    },
-    things() {
-      const loc = store.getLocation();
-      return loc.getThings();
+    // location() {
+    //   return store.getLocation();
+    // },
+    // description() {
+    //   const loc = store.getLocation();
+    //   return loc.callAction("describe");
+    // },
+    // things() {
+    //   const loc = store.getLocation();
+    //   return loc.getThings();
+    // },
+    bg() {
+      return `url(${store.bgs[this.game.activeLocationKey]})`;
     },
   },
-  data: () => ({}),
-  mounted: function () {
-    this.$refs.bg.style.backgroundImage = `url(${store.bgs.office})`;
-  },
+  data: () => ({
+    bgs: store.bgs,
+    game: store.game,
+  }),
+  // mounted: function () {
+  //   console.log(store.bgs, store.game.activeLocationKey);
+  //   this.$refs.bg.style.backgroundImage = `url(${
+  //     store.bgs[store.game.activeLocationKey]
+  //   })`;
+  // },
 };
 </script>
 
@@ -115,10 +132,10 @@ export default {
   background-color: rgb(17 21 24 / 85%);
   box-shadow: var(--tea-shadow);
   border: 1px solid var(--tea-bg-3);
-  height: 50%;
+  max-height: 50%;
   display: flex;
   flex-flow: column;
-  justify-content: center;
+  /* justify-content: center; */
   overflow-y: auto;
   z-index: 2;
   position: relative;

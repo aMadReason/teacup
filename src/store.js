@@ -1,11 +1,10 @@
 import { reactive } from 'vue';
-
 import data from './data';
 
 const store = {
   debug: true,
+  game: reactive(data),
   state: reactive({
-    game: data,
     response: 'Command responses will display here when submitted.',
     more: false,
     view: true,
@@ -13,16 +12,17 @@ const store = {
     triggerEl: null,
   }),
   bgs: {
-    office: require("@/assets/jordan-grimmer-office2.jpg")
+    'small office': require("@/assets/jordan-grimmer-office2.jpg"),
+    hallway: require("@/assets/resirealistic4flat2.jpg")
   },
-  getLocation(key = this.state.game.activeLocationKey) {
-    return this.state.game.getLocation(key);
+  getLocation(key) {
+    return this.game.getLocation(key || this.game.activeLocationKey);
   },
-  getCharacter(key = this.state.game.playerCharacterKey) {
-    return this.state.game.getCharacter(key);
+  getCharacter(key = this.game.playerCharacterKey) {
+    return this.game.getCharacter(key);
   },
   getLocations() {
-    return this.state.game.locations;
+    return this.game.locations;
   },
   getInventory() {
     const player = this.getCharacter('player');
@@ -67,17 +67,15 @@ const store = {
   },
   command(str) {
     const location = this.getLocation();
-    const attempt = this.state.game.command(str, {});
+    const attempt = this.game.command(str);
     const { lAttempt, pAttempt } = attempt;
+
     const lThings = lAttempt.actOnThings;
     const pThings = pAttempt.actOnThings;
-
-
 
     if (lAttempt.type === 'single') {
       return this.singleCommand(lAttempt);
     }
-
 
     if (lThings.length > 0 && pThings.length > 0) {
       const things = [...lThings, ...pThings];
