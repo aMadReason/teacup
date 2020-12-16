@@ -14,6 +14,10 @@ export default {
 </script>
 
 <style>
+body {
+  min-width: 300px;
+  overflow: hidden;
+}
 #app {
   height: 100%;
 }

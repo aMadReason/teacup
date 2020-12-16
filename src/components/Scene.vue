@@ -116,7 +116,7 @@ export default {
   height: 100%;
   width: 100%;
   max-width: 100%;
-  background-size: 100%;
+  background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
   transition: var(--view-transition);
@@ -143,6 +143,11 @@ export default {
   padding: 0.5rem 1rem;
   transition: var(--view-transition);
   opacity: 1;
+}
+
+.description .items:not(:empty) li {
+  margin: 0.5rem 0;
+  padding: 0.5rem 0;
 }
 
 .scene[data-view="false"] .description .corpus,

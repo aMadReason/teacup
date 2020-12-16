@@ -8,16 +8,16 @@ export const initialProps = () => ({
 });
 
 export const initialActs = {
-  examine: ({ me }) => me.p.details[me.stateKey] || me.p.details.default,
-  describe: ({ me }) => me.p.descriptions[me.stateKey] || me.p.descriptions.default,
-  help: () => "The following actions can be used on the [name]: [actions]"
+  examine: ({ me }) => me.sub(me.p.details[me.stateKey] || me.p.details.default),
+  describe: ({ me }) => me.sub(me.p.descriptions[me.stateKey] || me.p.descriptions.default),
+  help: ({ me }) => `The following actions can be used on the ${me.name}: ${me.sub('[actions]')}`
 };
 
 export const initialErrs = {
   empty: () => `Please enter something`,
   noThingSimple: ({ me, data }) => `There is no '${data.actOn || data.noun}' in the ${me.name}.`,
-  noAction: ({ data }) =>
-    `The '${data.action}' action is not available for the [name].`,
+  noAction: ({ me, data }) =>
+    me.sub(`The '${data.action}' action is not available for the [name].`),
   noNoun: () => "Commands should have at least a single noun.",
   multiMatch: ({ data }) => {
     return `There is more than one '${data.noun}' available, please specify which: ${data.things.map(i => `'${i.name}'`).join(', ')}.`

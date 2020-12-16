@@ -6,7 +6,7 @@
     v-bind:data-open="open"
     v-bind:data-position="position"
   >
-    <div class="inner">
+    <div class="inner" ref="root">
       <slot></slot>
     </div>
   </div>
@@ -37,7 +37,7 @@ export default {
       const focusables = this.$refs.root.querySelectorAll(
         "a, input, button, textarea, [tabindex='0'], [contenteditable='true']"
       );
-      return [].slice.call(focusables);
+      return [...[].slice.call(focusables)];
     },
     checkTab(e) {
       const { explicitOriginalTarget: target } = e;
@@ -53,11 +53,6 @@ export default {
       if (isFirst || isLast) e.preventDefault();
       if (isLast) first.focus();
       if (isFirst) last.focus();
-    },
-    udated() {
-      this.$nextTick(function () {
-        console.log("moo");
-      });
     },
   },
 };

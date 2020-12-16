@@ -5,10 +5,12 @@ const store = {
   debug: true,
   game: reactive(data),
   state: reactive({
+    overlayKey: 'start:one',
     response: 'Command responses will display here when submitted.',
     more: false,
     view: true,
     menu: false,
+    overlay: true,
     triggerEl: null,
   }),
   bgs: {
@@ -46,7 +48,8 @@ const store = {
     let response = res();
     if (actOnThings.length === 1) {
       actionList.map(i => {
-        response = response.replace(i, this.actionButton({ key, noun, name, action: i, label: i }))
+        const rgx = new RegExp("\\b" + i + "\\b")
+        response = response.replace(rgx, this.actionButton({ key, noun, name, action: i, label: i }))
       });
     }
     return response;
@@ -69,6 +72,8 @@ const store = {
     const location = this.getLocation();
     const attempt = this.game.command(str);
     const { lAttempt, pAttempt } = attempt;
+
+    if (!str && !lAttempt && !pAttempt) return null;
 
     const lThings = lAttempt.actOnThings;
     const pThings = pAttempt.actOnThings;
@@ -94,19 +99,6 @@ const store = {
     }
 
     return this.state.response = this.replaceThings(lAttempt);
-    // this.state.response = attempt.res();
-    // switch (attempt.type) {
-    //   case 'error':
-    //     this.state.response = attempt.res();
-    //     break;
-    //   case 'simple':
-    //     this.simpleCommand(attempt)
-    //     break;
-    //   case 'single':
-    //     this.singleCommand(attempt)
-    //     break;
-    // }
-
   }
 };
 

@@ -27,19 +27,23 @@ import Thing from './Thing';
 //   return prefab;
 // };
 
-const door = (world, { key, noun, fullname, description, detail, goToKey }) => {
+const door = (world, { key, noun, fullname, description, detail, goToKey, actionWords = ['open'] }) => {
   const prefab = new Thing({ key, noun, fullname });
   prefab.p.descriptions.default = description;
   prefab.p.details.default = detail
 
-  prefab.addAction('open', () => {
-    const location = world.getLocation(goToKey);
-    console.log({ goToKey, location, world });
-    if (!location) return 'Unknown location';
-    world.setLocation(location.key);
-    console.log({ world })
-    return prefab.sub(`Moved to ${location.name}`);
+  actionWords.map(word => {
+    prefab.addAction(word, () => {
+      const location = world.getLocation(goToKey);
+      console.log({ goToKey, location, world });
+      if (!location) return 'Unknown location';
+      world.setLocation(location.key);
+      console.log({ world })
+      return prefab.sub(`Moved to ${location.name}`);
+    });
   });
+
+
 
   return prefab;
 };

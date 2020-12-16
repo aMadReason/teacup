@@ -113,10 +113,10 @@ class Thing {
 
   callAction(key, data = {}) {
     const cb = this.actions[key];
-    if (!cb) return this.sub(this.errs.noAction({ data: { action: key } }));
+    if (!cb) return this.errs.noAction({ data: { action: key } });
     if (typeof cb !== "function") return cb;
     const result = cb({ me: this, data });
-    return this.sub(result);
+    return result;
   }
 
   parse(command, lexicon = {}) {
@@ -147,7 +147,7 @@ class Thing {
     if (type === "single") {
       const singleTxt = terms[0];
       const singleAct = this.getAction(singleTxt);
-      res = () => this.sub(this.errs.noAction(this, { action: singleTxt }));
+      res = () => this.errs.noAction(this, { action: singleTxt });
       if (singleAct) {
         res = () => this.callAction(singleTxt);
       }
@@ -160,7 +160,7 @@ class Thing {
       }
       if (actOnThings && actOnThings.length > 1) {
         type = 'error';
-        res = () => this.sub(this.errs.multiMatch({ me: this, data: { noun: nouns[0], things: actOnThings } }))
+        res = () => this.errs.multiMatch({ me: this, data: { noun: nouns[0], things: actOnThings } })
       }
       if (actOnThings && actOnThings.length === 1) {
         res = () => actOnThings[0].callAction(action);

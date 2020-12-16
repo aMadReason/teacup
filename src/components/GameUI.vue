@@ -1,15 +1,26 @@
 <template>
   <div id="app" data-theme="tea" class="full-width full-height">
+    <Overlay
+      :open="overlay"
+      ref="overlayEl"
+      v-on:taboverlay="(e) => handleTab(e, overlayElFocusables)"
+      v-on:escapeoverlay="toggleOverlay(false)"
+    >
+      <ModalContent />
+    </Overlay>
     <Drawer
       v-bind:open="menu"
       v-on:clickoverlay="toggleMenu()"
       v-on:escapedrawer="toggleMenu()"
-      v-on:tabdrawer="handleTab"
+      v-on:tabdrawer="(e) => handleTab(e, menuFocusables)"
+      ref="menuEl"
     >
-      <div ref="menuEl" v>
+      <div>
         <div class="titlebar">
           <button @click="toggleMenu" class="button">Menu</button>
         </div>
+
+        <button>boib</button>
       </div>
     </Drawer>
     <PushDrawer v-bind:open="more">
@@ -26,11 +37,7 @@
 
           <template v-slot:commander>
             <Commander v-on:toggleview="toggleView()">
-              <button
-                ref="toggleMoreEl"
-                class="button icon-button small"
-                @click="toggleMore"
-              >
+              <button ref="toggleMoreEl" class="button" @click="toggleMore">
                 <i class="fas fa-ellipsis-v" aria-hidden></i> More
               </button>
             </Commander>
@@ -87,11 +94,13 @@
 
 <script>
 import store from "../store.js";
-import Drawer from "../components/Drawer";
-import PushDrawer from "../components/PushDrawer";
+import Drawer from "../components/generics/Drawer";
+import PushDrawer from "../components/generics/PushDrawer";
+import Overlay from "../components/generics/Overlay";
 import Scene from "../components/Scene";
 import Commander from "../components/Commander";
 import Response from "../components/Response";
+import ModalContent from "../components/ModalContent";
 
 export default {
   name: "GameUI",
@@ -101,25 +110,23 @@ export default {
     Commander,
     Response,
     Drawer,
+    Overlay,
+    ModalContent,
   },
   props: [],
   computed: {
     view: () => store.state.view,
     more: () => store.state.more,
     menu: () => store.state.menu,
+    overlay: () => store.state.overlay,
     triggerEl: () => store.state.triggerEl,
-    focusables() {
+    menuFocusables() {
       return this.getFocusables("menuEl");
     },
-    // location() {
-    //   return this.sharedState.game.getLocation();
-    // },
-    // locations() {
-    //   return store.getLocations();
-    // },
-    // inventory() {
-    //   return store.getInventory();
-    // },
+    overlayElFocusables() {
+      console.log(this.getFocusables("overlayEl"));
+      return this.getFocusables("overlayEl");
+    },
     response() {
       return store.state.response;
     },
@@ -136,27 +143,33 @@ export default {
   }),
   watch: {
     menu(newVal) {
-      if (newVal) {
-        store.state.triggerEl = document.activeElement;
-        this.focusables[0].focus();
-      }
-      if (!newVal) {
-        store.state.triggerEl.focus();
-        store.state.triggerEl = null;
-      }
+      this.handleFocus(newVal, this.menuFocusables[0]);
+      store.state.response = newVal ? "Menu opened." : "Menu closed";
     },
     more(newVal) {
-      if (newVal) {
-        store.state.triggerEl = document.activeElement;
-        this.$refs.closeMoreEl.focus();
-      }
-      if (!newVal) {
-        store.state.triggerEl.focus();
-        store.state.triggerEl = null;
-      }
+      this.handleFocus(newVal, this.$refs.closeMoreEl);
+      store.state.response = newVal
+        ? "More drawer opened."
+        : "More drawer closed";
+    },
+    overlay(newVal) {
+      this.handleFocus(newVal, this.$refs.overlayEl);
+    },
+    moreOn(newVal) {
+      store.state.response = `More drawer set to ${newVal}`;
     },
   },
   methods: {
+    handleFocus(newVal, element) {
+      if (newVal) {
+        store.state.triggerEl = document.activeElement;
+        if (element) element.focus();
+      }
+      if (!newVal) {
+        if (store.state.triggerEl) store.state.triggerEl.focus();
+        store.state.triggerEl = null;
+      }
+    },
     toggleMore() {
       store.state.more = !store.state.more;
     },
@@ -169,10 +182,14 @@ export default {
     toggleMenu() {
       store.state.menu = !store.state.menu;
     },
-    handleTab(e) {
+    toggleOverlay(val = null) {
+      store.state.overlay = val !== null ? val : !store.state.overlay;
+    },
+    handleTab(e, focusables) {
+      console.log(focusables);
       const target = e.target;
-      const last = this.focusables[this.focusables.length - 1];
-      const first = this.focusables[0];
+      const last = focusables[focusables.length - 1];
+      const first = focusables[0];
       const isLast = target === last && !e.shiftKey;
       const isFirst = target === first && e.shiftKey;
 
@@ -181,10 +198,11 @@ export default {
       if (isFirst) last.focus();
     },
     getFocusables(ref) {
-      const focusables = this.$refs[ref].querySelectorAll(
-        "a, input, button, textarea, [tabindex='0'], [contenteditable='true']"
-      );
-      return [].slice.call(focusables);
+      return this.$refs[ref].getFocusables();
+      // const focusables = this.$refs[ref].querySelectorAll(
+      //   "a, input, button, textarea, [tabindex='0'], [contenteditable='true']"
+      // );
+      // return [].slice.call(focusables);
     },
     clickActionButton(e) {
       const { target } = e;
@@ -193,6 +211,12 @@ export default {
       if (!name || !action) return;
       store.command(`${action} ${name}`);
     },
+  },
+  mounted() {
+    const focusables = this.$refs.overlayEl.getFocusables();
+    if (focusables && focusables.length > 0) {
+      this.handleFocus(store.state.overlay, focusables[0]);
+    }
   },
 };
 </script>
