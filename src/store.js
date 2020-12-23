@@ -37,7 +37,7 @@ class HowlerChannel {
 }
 
 const atmospheres = new HowlerChannel();
-atmospheres.addTrack('dark', { volume: .2, src: require("@/assets/11-Dark fantasy Studio-Forensic (seamless).mp3") })
+//atmospheres.addTrack('dark', { volume: .2, src: require("@/assets/11-Dark fantasy Studio-Forensic (seamless).mp3") })
 
 const store = {
   debug: true,
@@ -55,7 +55,7 @@ const store = {
   scenes: {
     'small office': {
       bg: require("@/assets/jordan-grimmer-office2.jpg"),
-      atmosphere: 'dark'
+      atmosphere: false //'dark'
     },
     hallway: {
       bg: require("@/assets/resirealistic4flat2.jpg"),
