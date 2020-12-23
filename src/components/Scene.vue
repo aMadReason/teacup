@@ -8,7 +8,7 @@
         role="presentation"
         aria-hidden
         :style="{
-          backgroundImage: `url(${bgs[game.activeLocationKey]})`,
+          backgroundImage: `url(${scenes[game.activeLocationKey].bg})`,
         }"
       ></div>
       <div class="corpus box">
@@ -48,24 +48,8 @@ export default {
   props: {
     view: { type: Boolean, default: true },
   },
-  computed: {
-    // location() {
-    //   return store.getLocation();
-    // },
-    // description() {
-    //   const loc = store.getLocation();
-    //   return loc.callAction("describe");
-    // },
-    // things() {
-    //   const loc = store.getLocation();
-    //   return loc.getThings();
-    // },
-    bg() {
-      return `url(${store.bgs[this.game.activeLocationKey]})`;
-    },
-  },
   data: () => ({
-    bgs: store.bgs,
+    scenes: store.scenes,
     game: store.game,
   }),
   // mounted: function () {
@@ -74,6 +58,9 @@ export default {
   //     store.bgs[store.game.activeLocationKey]
   //   })`;
   // },
+  mounted() {
+    store.playAtmosphere();
+  },
 };
 </script>
 

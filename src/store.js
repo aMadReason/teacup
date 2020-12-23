@@ -1,5 +1,43 @@
 import { reactive } from 'vue';
 import data from './data';
+import { Howl } from 'howler';
+
+
+class HowlerChannel {
+  constructor(options) {
+    const initial = { volume: 1.0, preload: true, autoplay: false, muted: false, rate: 1.0 }
+    this.options = { ...initial, options };
+    this.tracks = {};
+  }
+  addTrack(key, options = {}) {
+    this.tracks[key] = new Howl({ ...this.options, ...options });
+    return this;
+  }
+  getTrack(key) {
+    return this.tracks[key];
+  }
+  play(key) {
+    const track = this.getTrack(key);
+    if (track) {
+      track.play()
+    }
+  }
+  updateTracks(options = {}) {
+    const keys = Object.keys(this.tracks);
+    const optionKeys = Object.keys({ ...this.options, ...options });
+    keys.map(i => {
+      const track = this.tracks[i];
+      optionKeys.map(opt => track[opt] = options[opt])
+    })
+  }
+  setVolume(volume) {
+    this.volume = volume;
+    this.updateTracks({ volume })
+  }
+}
+
+const atmospheres = new HowlerChannel();
+atmospheres.addTrack('dark', { volume: .2, src: require("@/assets/11-Dark fantasy Studio-Forensic (seamless).mp3") })
 
 const store = {
   debug: true,
@@ -13,9 +51,22 @@ const store = {
     overlay: true,
     triggerEl: null,
   }),
-  bgs: {
-    'small office': require("@/assets/jordan-grimmer-office2.jpg"),
-    hallway: require("@/assets/resirealistic4flat2.jpg")
+  atmospheres,
+  scenes: {
+    'small office': {
+      bg: require("@/assets/jordan-grimmer-office2.jpg"),
+      atmosphere: 'dark'
+    },
+    hallway: {
+      bg: require("@/assets/resirealistic4flat2.jpg"),
+      atmosphere: false
+    }
+  },
+  playAtmosphere(key = this.game.activeLocationKey) {
+    const scene = this.scenes[key];
+    if (scene.atmosphere) {
+      this.atmospheres.play(scene.atmosphere)
+    }
   },
   getLocation(key) {
     return this.game.getLocation(key || this.game.activeLocationKey);
