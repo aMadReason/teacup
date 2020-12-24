@@ -1,5 +1,5 @@
 <template>
-  <div id="app" data-theme="tea" class="full-width full-height">
+  <div data-theme="tea" class="gameui full-height">
     <Overlay
       :open="overlay"
       ref="overlayEl"
@@ -19,9 +19,9 @@
         <div class="titlebar">
           <button @click="toggleMenu" class="button">Menu</button>
         </div>
-
-        <button>boib</button>
       </div>
+
+      <MenuContent />
     </Drawer>
     <PushDrawer v-bind:open="more">
       <template v-slot:left>
@@ -94,13 +94,14 @@
 
 <script>
 import store from "../store.js";
-import Drawer from "../components/generics/Drawer";
-import PushDrawer from "../components/generics/PushDrawer";
-import Overlay from "../components/generics/Overlay";
-import Scene from "../components/Scene";
-import Commander from "../components/Commander";
-import Response from "../components/Response";
-import ModalContent from "../components/ModalContent";
+import Drawer from "./generics/Drawer";
+import PushDrawer from "./generics/PushDrawer";
+import Overlay from "./generics/Overlay";
+import Scene from "./Scene";
+import Commander from "./Commander";
+import Response from "./Response";
+import ModalContent from "./ModalContent";
+import MenuContent from "./MenuContent";
 
 export default {
   name: "GameUI",
@@ -112,12 +113,14 @@ export default {
     Drawer,
     Overlay,
     ModalContent,
+    MenuContent,
   },
   props: [],
   computed: {
     view: () => store.state.view,
     more: () => store.state.more,
     menu: () => store.state.menu,
+    activeUI: () => store.state.activeUI,
     overlay: () => store.state.overlay,
     triggerEl: () => store.state.triggerEl,
     menuFocusables() {
@@ -186,7 +189,6 @@ export default {
       store.state.overlay = val !== null ? val : !store.state.overlay;
     },
     handleTab(e, focusables) {
-      console.log(focusables);
       const target = e.target;
       const last = focusables[focusables.length - 1];
       const first = focusables[0];
@@ -199,10 +201,6 @@ export default {
     },
     getFocusables(ref) {
       return this.$refs[ref].getFocusables();
-      // const focusables = this.$refs[ref].querySelectorAll(
-      //   "a, input, button, textarea, [tabindex='0'], [contenteditable='true']"
-      // );
-      // return [].slice.call(focusables);
     },
     clickActionButton(e) {
       const { target } = e;
@@ -217,6 +215,9 @@ export default {
     if (focusables && focusables.length > 0) {
       this.handleFocus(store.state.overlay, focusables[0]);
     }
+  },
+  updated() {
+    console.log(store.state.activeUI);
   },
 };
 </script>

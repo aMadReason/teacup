@@ -185,7 +185,7 @@ pre {
   page-break-inside: avoid;
   font-family: monospace;
   overflow: auto;
-  padding: 1em 1.5em;
+  padding: var(--tea-spacing);
   display: block;
   word-wrap: break-word;
 }

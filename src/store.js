@@ -43,12 +43,13 @@ const store = {
   debug: true,
   game: reactive(data),
   state: reactive({
+    activeUI: 'GameUI', // GameUI, CreditsUI
     overlayKey: 'start:one',
     response: 'Command responses will display here when submitted.',
     more: false,
     view: true,
     menu: false,
-    overlay: true,
+    overlay: false,
     triggerEl: null,
   }),
   atmospheres,
@@ -61,6 +62,9 @@ const store = {
       bg: require("@/assets/resirealistic4flat2.jpg"),
       atmosphere: false
     }
+  },
+  switchActiveUI(e, key) {
+    this.state.activeUI = key;
   },
   playAtmosphere(key = this.game.activeLocationKey) {
     const scene = this.scenes[key];

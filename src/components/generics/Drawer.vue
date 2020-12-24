@@ -153,8 +153,7 @@ export default {
   pointer-events: all;
 }
 
-/* Medium devices (tablets, 768px and up) */
-@media screen and (min-width: 768px) {
+@media screen and (min-width: 600px) {
   .drawer[data-position="left"],
   .drawer[data-position="right"] {
     --tea-menu-maxwidth: 50%;
@@ -171,8 +170,7 @@ export default {
   }
 }
 
-/* Large devices (desktops, 992px and up) */
-@media screen and (min-width: 992px) and (orientation: landscape) {
+@media screen and (min-width: 1000px) {
   .drawer[data-position="left"],
   .drawer[data-position="right"] {
     --tea-menu-maxwidth: 25%;
