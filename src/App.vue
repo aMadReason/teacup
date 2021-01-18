@@ -1,24 +1,19 @@
 <template>
-  <!-- <HelloWorld msg="Hello Vue 3 in CodeSandbox!" /> -->
   <div class="app">
-    <GameUI v-if="state.activeUI === 'GameUI'" />
-    <CreditsUI v-if="state.activeUI === 'CreditsUI'" />
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import GameUI from "./components/GameUI.vue";
-import CreditsUI from "./components/CreditsUI.vue";
 import store from "./store";
 export default {
   name: "App",
-  components: {
-    GameUI,
-    CreditsUI,
-  },
+  components: {},
   data: () => ({
+    store,
     state: store.state,
   }),
+  methods: {},
 };
 </script>
 
@@ -28,5 +23,8 @@ body {
 }
 .app {
   height: 100vh;
+}
+.menu {
+  background: var(--tea-bg-3);
 }
 </style>

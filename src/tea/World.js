@@ -9,6 +9,7 @@ class World {
     this.playerCharacterKey = null;
     this.locations = [];
     this.characters = [];
+    this.things = [];
     this.lexicon = {};
   }
 

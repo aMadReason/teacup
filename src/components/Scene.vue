@@ -58,6 +58,9 @@ export default {
   //     store.bgs[store.game.activeLocationKey]
   //   })`;
   // },
+  updated() {
+    store.playAtmosphere();
+  },
   mounted() {
     store.playAtmosphere();
   },
@@ -133,8 +136,8 @@ export default {
 }
 
 .description .items:not(:empty) li {
-  margin: 0.5rem 0;
-  padding: 0.5rem 0;
+  margin: 0 0;
+  padding: 0.1rem 0;
 }
 
 .scene[data-view="false"] .description .corpus,

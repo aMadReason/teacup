@@ -27,29 +27,56 @@ import Thing from './Thing';
 //   return prefab;
 // };
 
-const door = (world, { key, noun, fullname, description, detail, goToKey, actionWords = ['open'] }) => {
+const door = (world, { key, noun, fullname, description, descriptions, detail, goToKey, actionWords = ['open'] }) => {
   const prefab = new Thing({ key, noun, fullname });
-  prefab.p.descriptions.default = description;
+  prefab.p.descriptions = { ...descriptions, default: description || descriptions.default };
   prefab.p.details.default = detail
 
   actionWords.map(word => {
     prefab.addAction(word, () => {
       const location = world.getLocation(goToKey);
-      console.log({ goToKey, location, world });
       if (!location) return 'Unknown location';
       world.setLocation(location.key);
-      console.log({ world })
       return prefab.sub(`Moved to ${location.name}`);
     });
   });
-
-
 
   return prefab;
 };
 
 
+const item = (world, { key, noun, fullname, description, descriptions, detail }) => {
+  const prefab = new Thing({ key, noun, fullname });
+  prefab.p.descriptions = { ...descriptions, default: description || descriptions.default };
+  prefab.p.details.default = detail;
+
+  const take = () => {
+
+    const player = prefab.world.player;
+    const parent = prefab.parent;
+    if (parent) parent.removeThing(prefab.key);
+    if (player) player.addThing(prefab);
+    return prefab.sub(`Taken [name] from ${parent.name}`);
+  };
+  prefab.addAction('take', take);
+  prefab.addAction('pick', take);
+
+  // const drop = () => {
+  //   const location = prefab.world.getLocation();
+  //   const player = prefab.world.player;
+  //   if (player) player.removeThing(prefab.key);
+  //   if (location) location.addThing(prefab);
+  //   return prefab.sub(`Dropped [name] in ${location.name}`);
+  // };
+  // prefab.addAction('drop', drop);
+  // prefab.addAction('leave', drop);
+
+  return prefab;
+}
+
+
 
 export {
-  door
+  door,
+  item
 }

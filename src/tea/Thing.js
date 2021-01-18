@@ -61,6 +61,7 @@ class Thing {
   get detail() {
     return this.sub(this.props.details[this.stateKey]);
   }
+
   /**
    * Substitutions used in props, actions and errors
    * @param {String} str 
@@ -83,7 +84,17 @@ class Thing {
   addThing(thing) {
     if (thing instanceof Thing === false) return null;
     thing.parent = this;
-    thing.world = this.world;
+
+    if (this.world) {
+      thing.world = this.world;
+      const idx = this.world.things.findIndex(i => i.key === thing.key);
+      if (idx > -1) {
+        this.world.things[idx] = thing;
+      } else {
+        this.world.things.push(thing);
+      }
+    }
+
     this.things.push(thing);
     return this;
   }
@@ -137,7 +148,7 @@ class Thing {
 
     const actOnThings = actOn ? this.findThings(actOn) : false;
     const actWithThings = actWith ? this.findThings(actWith) : false;
-    const act = action ? this.findThings(action) : false;
+    //const act = action ? this.findThings(action) : false;
 
     if (type === 'empty') {
       type = 'error';
@@ -167,14 +178,19 @@ class Thing {
       }
     }
 
-    return {
+    const output = {
       res,
       type,
       actOnThings,
       actWithThings,
-      act,
+      //act,
       ...parsed
-    };
+    }
+
+    const event = new CustomEvent('build', { detail: { output } });
+    window.dispatchEvent(event);
+
+    return output;
   }
 }
 

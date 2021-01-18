@@ -5,12 +5,27 @@ import { Howl } from 'howler';
 
 class HowlerChannel {
   constructor(options) {
-    const initial = { volume: 1.0, preload: true, autoplay: false, muted: false, rate: 1.0 }
-    this.options = { ...initial, options };
+    const initial = { volume: 1.0, preload: true, autoplay: false, muted: false, rate: 1.0, fadeDuration: 2000 }
+    this.options = { ...initial, ...options };
     this.tracks = {};
   }
   addTrack(key, options = {}) {
-    this.tracks[key] = new Howl({ ...this.options, ...options });
+    const track = new Howl({ ...this.options, ...options });
+    track.playing = false;
+
+    track.on('end', () => {
+      track.pos(0);
+      track.playing = false;
+    });
+
+    track.on('stop', () => {
+      track.pos(0);
+      track.playing = false;
+    });
+
+    track.on('play', () => track.playing = true);
+
+    this.tracks[key] = track;
     return this;
   }
   getTrack(key) {
@@ -19,8 +34,27 @@ class HowlerChannel {
   play(key) {
     const track = this.getTrack(key);
     if (track) {
-      track.play()
+      track.pos(0).play();
     }
+  }
+  fadeIn(key, duration = this.options.fadeDuration) {
+    const track = this.getTrack(key);
+    if (track && !track.playing) {
+      this.play(key)
+      track.fade(0, this.options.volume, duration);
+    }
+  }
+  fadeOut(key, duration = this.options.fadeDuration) {
+    const track = this.getTrack(key);
+    if (track && track.playing) {
+      track.fade(this.options.volume, 0, duration);
+    }
+  }
+  crossFade(toKey) {
+    const playing = Object.keys(this.tracks).filter(i => this.tracks[i].playing && i !== toKey);
+    const to = this.getTrack(toKey);
+    playing.map(i => this.fadeOut(i));
+    if (to) this.fadeIn(toKey);
   }
   updateTracks(options = {}) {
     const keys = Object.keys(this.tracks);
@@ -36,41 +70,36 @@ class HowlerChannel {
   }
 }
 
-const atmospheres = new HowlerChannel();
-//atmospheres.addTrack('dark', { volume: .2, src: require("@/assets/11-Dark fantasy Studio-Forensic (seamless).mp3") })
+const atmospheres = new HowlerChannel({ volume: .3 });
+atmospheres.addTrack('dark', { src: require("@/assets/atmosphere/very-low-note-by-kevin-macleod-from-filmmusic-io.mp3"), loop: true })
+atmospheres.addTrack('anxiety', { src: require("@/assets/atmosphere/anxiety-by-kevin-macleod-from-filmmusic-io.mp3") })
+
+const effects = new HowlerChannel({ volume: .3 });
+effects.addTrack('pickup', { src: require("@/assets/kenny_rpg/handleSmallLeather2.ogg") })
 
 const store = {
   debug: true,
   game: reactive(data),
   state: reactive({
-    activeUI: 'GameUI', // GameUI, CreditsUI
-    overlayKey: 'start:one',
+    playerThings: data.player.things,
     response: 'Command responses will display here when submitted.',
     more: false,
-    view: true,
-    menu: false,
-    overlay: false,
-    triggerEl: null,
+    view: true
   }),
   atmospheres,
   scenes: {
     'small office': {
       bg: require("@/assets/jordan-grimmer-office2.jpg"),
-      atmosphere: false //'dark'
+      atmosphere: 'dark'
     },
     hallway: {
       bg: require("@/assets/resirealistic4flat2.jpg"),
-      atmosphere: false
+      atmosphere: 'anxiety'
     }
-  },
-  switchActiveUI(e, key) {
-    this.state.activeUI = key;
   },
   playAtmosphere(key = this.game.activeLocationKey) {
     const scene = this.scenes[key];
-    if (scene.atmosphere) {
-      this.atmospheres.play(scene.atmosphere)
-    }
+    if (scene.atmosphere) this.atmospheres.crossFade(scene.atmosphere);
   },
   getLocation(key) {
     return this.game.getLocation(key || this.game.activeLocationKey);
@@ -93,7 +122,6 @@ const store = {
   singleCommand(attempt) {
     const { original } = attempt;
     if (original.toLowerCase() === 'view') this.state.view = !this.state.view;
-    if (original.toLowerCase() === 'menu') this.state.menu = !this.state.menu;
     if (original.toLowerCase() === 'more') this.state.more = !this.state.more;
     if (original.toLowerCase() === 'clear') this.state.response = '';
   },
@@ -123,6 +151,14 @@ const store = {
 
     return response;
   },
+  handleSoundEffects({ locationAttempt = {}, playerAttempt = {} }) {
+    const err = locationAttempt.type === 'error' && playerAttempt.type === 'error';
+    if (err) return console.log(err);
+
+    // need to code to find the correct action and item sound
+
+    console.log({ locationAttempt, playerAttempt })
+  },
   command(str) {
     const location = this.getLocation();
     const attempt = this.game.command(str);
@@ -130,8 +166,10 @@ const store = {
 
     if (!str && !lAttempt && !pAttempt) return null;
 
-    const lThings = lAttempt.actOnThings;
-    const pThings = pAttempt.actOnThings;
+    const lThings = lAttempt.actOnThings; // location attempt
+    const pThings = pAttempt.actOnThings; // player attempt
+
+    this.handleSoundEffects({ locationAttempt: lAttempt, playerAttempt: pAttempt })
 
     if (lAttempt.type === 'single') {
       return this.singleCommand(lAttempt);

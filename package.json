@@ -12,7 +12,8 @@
     "compromise": "^13.8.0",
     "core-js": "^3.8.1",
     "howler": "^2.2.1",
-    "vue": "^3.0.4"
+    "vue": "^3.0.4",
+    "vue-router": "^4.0.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

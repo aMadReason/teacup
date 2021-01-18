@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="drawer"
     @keydown.esc="$emit('escapedrawer', $event)"
     @keydown.tab="$emit('tabdrawer', $event)"
     class="drawer"
@@ -32,29 +33,48 @@ export default {
     overlay: { type: Boolean, default: true },
   },
   data: () => ({}),
+  watch: {
+    open(newValue) {
+      return newValue;
+    },
+  },
   methods: {
     getFocusables() {
       const focusables = this.$refs.root.querySelectorAll(
-        "a, input, button, textarea, [tabindex='0'], [contenteditable='true']"
+        "button, a, input, select, textarea, [tabindex]"
       );
       return [...[].slice.call(focusables)];
     },
+    handleOpenState(open = this.open) {
+      const els = this.getFocusables();
+      els.forEach((i) => {
+        i.setAttribute("tabindex", open ? 0 : -1);
+        i.setAttribute("aria-hidden", open);
+      });
+
+      this.$refs.drawer.setAttribute("tabindex", open ? 0 : -1);
+      this.$refs.drawer.setAttribute("aria-hidden", open);
+    },
+    /*
     checkTab(e) {
       const { explicitOriginalTarget: target } = e;
       const focusables = this.getFocusables();
 
       if (focusables.length === 0) return undefined;
 
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      const isLast = target === last && !e.shiftKey;
-      const isFirst = target === first && e.shiftKey;
+      if (this.open) {
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const isLast = target === last && !e.shiftKey;
+        const isFirst = target === first && e.shiftKey;
 
-      if (isFirst || isLast) e.preventDefault();
-      if (isLast) first.focus();
-      if (isFirst) last.focus();
-    },
+        if (isFirst || isLast) e.preventDefault();
+        if (isLast) first.focus();
+        if (isFirst) last.focus();
+      } 
+    },*/
   },
+  mounted() {},
 };
 </script>
 
@@ -78,6 +98,14 @@ export default {
   transition: var(--tea-menu-transition, transform 300ms ease);
   box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12),
     0 2px 4px -1px rgba(0, 0, 0, 0.3);
+}
+
+.drawer .inner {
+  display: none;
+}
+
+.drawer[data-open="true"] .inner {
+  display: initial;
 }
 .drawer[data-position="left"] {
   left: 0;

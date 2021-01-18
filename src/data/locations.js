@@ -1,7 +1,7 @@
 import Thing from '../tea/Thing';
-import { bin } from './items';
+import { bin, book1, book2 } from './items';
 
-import { door } from '../tea/prefabs';
+import { door, item } from '../tea/prefabs';
 
 export const office = (world) => {
   const location = new Thing({ noun: 'office', fullname: 'small office', world });
@@ -9,7 +9,10 @@ export const office = (world) => {
   location.p.descriptions.default =
     'The [name] is small but sparse, populated only with a set of old, cluttered shelves, a thread-bare computer chair, a nondescript desk with drawers and a waste paper bin. The room itself is dimly illuminated with by sick combination of blue monitor light and a buzzing fluorescent from an old tube light mounted above the desk.';
 
-  location.addThing(bin)
+  location.addThing(bin);
+  location.addThing(book1)
+  location.addThing(book2);
+
 
   const metalDoor = door(world, {
     noun: 'door',
@@ -18,8 +21,15 @@ export const office = (world) => {
     detail: 'It should be easy to open the [name].',
     goToKey: 'hallway'
   });
-
   location.addThing(metalDoor)
+
+  const ball = item(world, {
+    noun: 'ball',
+    fullname: 'red ball',
+    description: 'A small [name].'
+    // detail: 'It should be easy to open the [name].',
+  });
+  location.addThing(ball);
 
   return location
 };
