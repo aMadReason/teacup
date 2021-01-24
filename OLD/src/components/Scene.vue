@@ -8,16 +8,15 @@
         role="presentation"
         aria-hidden
         :style="{
-          backgroundImage: `url(${scenes[activeLocation.key].bg})`,
+          backgroundImage: `url(${scenes[game.activeLocationKey].bg})`,
         }"
       ></div>
       <div class="corpus box">
-        {{ activeLocation.description }}
+        {{ game.location.description }}
       </div>
       <div class="items box">
         <ul class="unstyled">
-          <li v-for="thing in activeLocation.things" v-bind:key="thing.key">
-            <!-- <div v-html="rawHtml"></div> -->
+          <li v-for="thing in game.location.things" v-bind:key="thing.key">
             <Description v-bind:thing="thing" />
           </li>
         </ul>
@@ -37,6 +36,7 @@
 </template>
 
 <script>
+import store from "../store.js";
 import Description from "./Description";
 
 export default {
@@ -46,11 +46,27 @@ export default {
   },
   props: {
     view: { type: Boolean, default: true },
-    scenes: { type: Object, default: undefined },
-    activeLocation: { type: Object, default: undefined },
   },
-  computed: {},
-  data: () => ({}),
+  computed: {
+    game() {
+      return this.$root.game;
+    },
+  },
+  data: () => ({
+    scenes: store.scenes,
+  }),
+  // mounted: function () {
+  //   console.log(store.bgs, store.game.activeLocationKey);
+  //   this.$refs.bg.style.backgroundImage = `url(${
+  //     store.bgs[store.game.activeLocationKey]
+  //   })`;
+  // },
+  updated() {
+    store.playAtmosphere(this.game.activeLocationKey);
+  },
+  mounted() {
+    store.playAtmosphere(this.game.activeLocationKey);
+  },
 };
 </script>
 

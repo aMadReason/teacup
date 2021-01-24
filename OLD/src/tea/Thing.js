@@ -1,5 +1,4 @@
-import cmdParser from "./utilities/CmdParser";
-import uuid from "./utilities/uuid";
+import cmdParser from "./CmdParser";
 import {
   initialProps,
   initialActs,
@@ -9,41 +8,30 @@ import {
 
 class Thing {
   constructor({
-    key = null, // required
-    noun = "", // required
+    key = null,
+    noun = "",
     fullname = null,
     props = {},
     actions = {},
+    things = [],
     stateKey = "default",
     subs = {},
     errs = {},
     world = false,
-    parentKey = false,
-    description = false, // default description
-    detail = false // default detail
+    parent = false
   }) {
-    this.key = key || uuid(6);
+    this.key = key || fullname || noun;
     this.noun = noun;
     this.fullname = fullname;
     this.props = { ...initialProps(), ...props };
     this.actions = { ...initialActs, ...actions };
+    this.things = [...things];
     this.stateKey = stateKey;
     this.errs = { ...initialErrs, errs };
     this.subs = { ...initialSubs, ...subs };
     this.world = world;
-    this.parentKey = parentKey;
+    this.parent = parent;
 
-    if (description) {
-      this.props.descriptions.default = description;
-    }
-
-    if (detail) {
-      this.props.details.default = detail;
-    }
-  }
-
-  get parent() {
-    return this.world.findThing(this.parentKey);
   }
 
   get name() {
@@ -54,11 +42,8 @@ class Thing {
     return [...Object.keys(this.actions)];
   }
 
-  // get thingList() {
-  //   return this.getThings().map((i) => i.name);
-  // }
-  get things() {
-    return this.getThings();
+  get thingList() {
+    return this.things.map((i) => i.name);
   }
 
   get p() {
@@ -91,40 +76,43 @@ class Thing {
   removeThing(key) {
     const thing = this.findThing(key);
     if (thing) {
-      this.world.things = this.world.things.filter(i => i.key !== thing.key);
+      this.things = this.things.filter(i => i.key !== thing.key);
     }
     return thing;
   }
 
   addThing(thing) {
     if (thing instanceof Thing === false) return null;
-    thing.parentKey = this.key;
+    thing.parent = this;
 
-    thing.world = this.world;
-    const worldThings = this.world.things;
-    const idx = worldThings.findIndex(i => i.key === thing.key);
-    if (idx > -1) {
-      console.warn('Attempting to add Thing with duplicate key.')
-    } else {
-      this.world.things.push(thing);
+    if (this.world) {
+      thing.world = this.world;
+      const worldThings = this.world.things;
+      const idx = worldThings.findIndex(i => i.key === thing.key);
+      if (idx > -1) {
+        worldThings[idx] = thing;
+      } else {
+        this.world.things = [...this.world.things, thing];
+      }
     }
 
+    this.things = [...this.things, thing];
     return this;
   }
 
   findThing(key) {
-    return this.world.things.find(i => i.key === key);
+    return this.things.find(i => i.key === key)
   }
 
   findThings(word) {
-    const things = this.getThings().filter(i => {
-      return [i.fullname, i.noun, i.key].includes(word)
+    const things = [...this.things, this].filter((i) => {
+      return [i.fullname, i.noun, i.key].includes(word);
     });
     return things;
   }
 
   getThings() {
-    return this.world.things.filter(i => i.parentKey === this.key);
+    return this.things;
   }
 
   addAction(key, cb = () => { }) {
@@ -199,6 +187,9 @@ class Thing {
       //act,
       ...parsed
     }
+
+    const event = new CustomEvent('build', { detail: { output } });
+    window.dispatchEvent(event);
 
     return output;
   }

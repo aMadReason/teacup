@@ -1,8 +1,8 @@
 <template>
   <div data-theme="tea" class="gameui full-height">
-    <PushDrawer v-bind:open="more">
+    <PushDrawer v-bind:open="more" @click="clickActionButton">
       <template v-slot:left>
-        <Scene v-bind:view="view" @click="clickActionButton">
+        <Scene v-bind:view="view">
           <div class="titlebar full-width">
             <router-link to="/menu">Menu</router-link>
             <div class="title-text">
@@ -48,21 +48,21 @@
             </button>
           </div>
 
-          <div v-if="locationsOn">
-            <ul>
-              <li v-for="l in game.locations" :key="l.key">
-                {{ l.name }}
-              </li>
-            </ul>
-          </div>
+          <!-- <div v-if="locationsOn"> -->
+          <ul>
+            <li v-for="l in game.locations" v-bind:key="l.key">
+              {{ l.name }}
+            </li>
+          </ul>
+          <!-- </div> -->
 
-          <div v-if="inventoryOn">
-            <ul>
-              <li v-for="(item, i) in playerThings" :key="i">
-                {{ item.name }}
-              </li>
-            </ul>
-          </div>
+          <!-- <div v-if="inventoryOn"> -->
+          <ul>
+            <li v-for="thing in game.player.things" v-bind:key="thing.key">
+              <Description v-bind:thing="thing" />
+            </li>
+          </ul>
+          <!-- </div> -->
         </div>
       </template>
     </PushDrawer>
@@ -75,6 +75,7 @@ import PushDrawer from "./generics/PushDrawer";
 import Scene from "./Scene";
 import Commander from "./Commander";
 import Response from "./Response";
+import Description from "./Description";
 
 export default {
   name: "GameUI",
@@ -83,6 +84,7 @@ export default {
     Scene,
     Commander,
     Response,
+    Description,
   },
   props: [],
   computed: {
@@ -90,21 +92,21 @@ export default {
     more: () => store.state.more,
     activeUI: () => store.state.activeUI,
     triggerEl: () => store.state.triggerEl,
-    response() {
-      return store.state.response;
-    },
+    response: () => store.state.response,
     inventoryOn() {
       return this.moreOn === "inventory";
     },
     locationsOn() {
       return this.moreOn === "locations";
     },
+    game() {
+      return this.$root.game;
+    },
   },
   data: () => ({
     moreOn: "inventory",
     store,
-    game: store.game,
-    playerThings: store.state.playerThings,
+    state: store.state,
   }),
   watch: {
     more(newVal) {
@@ -156,7 +158,8 @@ export default {
       const name = target.getAttribute("data-name");
       const action = target.getAttribute("data-action");
       if (!name || !action) return;
-      store.command(`${action} ${name}`);
+      this.$root.command(`${action} ${name}`);
+      this.$forceUpdate();
     },
   },
 };

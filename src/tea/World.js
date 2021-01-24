@@ -1,25 +1,30 @@
 
 //import Thing from './Thing'
 
-
-
 class World {
   constructor() {
-    this.activeLocationKey = null;
-    this.playerCharacterKey = null;
+    this.player = null;
     this.locations = [];
+    this.location = null;
     this.characters = [];
     this.things = [];
     this.lexicon = {};
+    this.preHook = () => { };
+    this.postHook = () => { }
   }
 
-  get player() {
-    return this.getCharacter();
+  // get player() {
+  //   return this.getCharacter();
+  // }
+
+  get inventory() {
+    const player = this.getCharacter();
+    return player.things;
   }
 
-  get location() {
-    return this.getLocation();
-  }
+  // get location() {
+  //   return this.getLocation();
+  // }
 
   setLexicon(lexicon) {
     this.lexicon = { ...lexicon };
@@ -27,41 +32,49 @@ class World {
   }
 
   setPlayer(key) {
-    const toBe = this.getCharacter({ key });
-    if (!toBe) throw Error('Character not found.');
-    this.playerCharacterKey = toBe.key;
+    const character = this.getCharacter(key);
+    if (!character) throw Error('Character not found.');
+    this.player = character;
   }
 
   setLocation(key) {
-    const toBe = this.getLocation(key);
-    if (!toBe) throw Error('Location not found.');
-    this.activeLocationKey = toBe.key;
+    const location = this.getLocation(key);
+    if (!location) throw Error(`Location with key "${key}" not found.`);
+    this.location = location;
   }
 
   addLocation(thing) {
     thing.world = this;
     this.locations.push(thing);
-    if (!this.activeLocationKey && this.locations.length === 1) {
-      this.activeLocationKey = thing.key;
+    //this.locations = [...this.locations, thing];
+    if (!this.location && this.locations.length === 1) {
+      this.location = thing;
     }
   }
 
-  getLocation(key = this.activeLocationKey) {
+  getLocation(key = this.location.key) {
     const location = this.locations.find(l => l.key === key);
     return location;
   }
 
   addCharacter(thing) {
     thing.world = this;
-    this.characters.push(thing);
-    if (!this.playerCharacterKey && this.characters.length === 1) {
-      this.playerCharacterKey = thing.key;
+    //this.characters = [...this.characters, thing];
+    this.characters.push(thing)
+    if (!this.player && this.characters.length === 1) {
+      this.player = thing;
     }
   }
 
-  getCharacter(key = this.playerCharacterKey) {
+  getCharacter(key = this.player.key) {
     const character = this.characters.find(c => c.key === key);
     return character;
+  }
+
+  findThing(key) {
+    const thing = this.things.find(i => key === i.key);
+    const location = this.locations.find(i => key === i.key);
+    return thing || location;
   }
 
   command(str, lexicon) {
@@ -69,29 +82,6 @@ class World {
     const lAttempt = location.tryAnd(str, lexicon || this.lexicon);
     const player = this.getCharacter();
     const pAttempt = player.tryAnd(str, lexicon || this.lexicon);
-
-    // const inLocation = lAttempt.actOnThings.length;
-    // const onPlayer = pAttempt.actOnThings.length;
-
-
-    // if (inLocation > 0 && onPlayer === 0) {
-    //   return lAttempt;
-    // }
-
-    // if (inLocation === 0 && onPlayer > 0) {
-    //   return pAttempt;
-    // }
-
-    // if (inLocation > 0 && onPlayer > 0) {
-    //   const lLoc = lAttempt.actOnThings[0];
-    //   lAttempt.res = () => {
-    //     let msg = `There is more than one '${lLoc.noun}'. `;
-    //     msg += `In the '${location.name}'; ${lAttempt.actOnThings.map(i => i.name).join(', ')}. `;
-    //     msg += `In the inventory; ${pAttempt.actOnThings.map(i => i.name).join(", ")}`;
-    //     lAttempt.actOnThings = [...lAttempt.actOnThings, ...pAttempt.actOnThings];
-    //     return msg;
-    //   }
-    // }
 
     return {
       lAttempt,
