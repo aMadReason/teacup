@@ -9,6 +9,7 @@
     "gh-pages": "git subtree push --prefix dist origin gh-pages"
   },
   "dependencies": {
+    "annyang": "^2.6.1",
     "compromise": "^13.8.0",
     "core-js": "^3.8.1",
     "howler": "^2.2.1",

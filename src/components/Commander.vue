@@ -2,6 +2,7 @@
   <form @submit.prevent="cmd" class="commander">
     <div class="cmd-controls">
       <input
+        ref="cmdinput"
         autocomplete="on"
         class="input"
         @keyup.ctrl.c="clearResponse"

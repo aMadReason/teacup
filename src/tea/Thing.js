@@ -137,7 +137,7 @@ class Thing {
 
   callAction(key, data = {}) {
     const cb = this.actions[key];
-    if (!cb) return this.errs.noAction({ data: { action: key } });
+    if (!cb) return this.errs.noAction({ me: this, data: { action: key } });
     if (typeof cb !== "function") return cb;
     const result = cb({ me: this, data });
     return result;
@@ -161,7 +161,6 @@ class Thing {
 
     const actOnThings = actOn ? this.findThings(actOn) : false;
     const actWithThings = actWith ? this.findThings(actWith) : false;
-    //const act = action ? this.findThings(action) : false;
 
     if (type === 'empty') {
       type = 'error';
@@ -171,7 +170,7 @@ class Thing {
     if (type === "single") {
       const singleTxt = terms[0];
       const singleAct = this.getAction(singleTxt);
-      res = () => this.errs.noAction(this, { action: singleTxt });
+      res = () => this.errs.noAction({ me: this, action: singleTxt });
       if (singleAct) {
         res = () => this.callAction(singleTxt);
       }

@@ -7,6 +7,7 @@
         ref="bg"
         role="presentation"
         aria-hidden
+        :data-light="light"
         :style="{
           backgroundImage: `url(${scenes[activeLocation.key].bg})`,
         }"
@@ -16,7 +17,10 @@
       </div>
       <div class="items box">
         <ul class="unstyled">
-          <li v-for="thing in activeLocation.things" v-bind:key="thing.key">
+          <li
+            v-for="thing in $root.location.things"
+            v-bind:key="`${thing.key}-${thing.stateKey}`"
+          >
             <!-- <div v-html="rawHtml"></div> -->
             <Description v-bind:thing="thing" />
           </li>
@@ -48,8 +52,20 @@ export default {
     view: { type: Boolean, default: true },
     scenes: { type: Object, default: undefined },
     activeLocation: { type: Object, default: undefined },
+    light: { type: Boolean, default: true },
   },
-  computed: {},
+
+  computed: {
+    things: function () {
+      return this.$root.location.things;
+    },
+
+    // light: function () {
+    //   const things = this.activeLocation.things;
+    //   const light = things.find((i) => i.noun === "switch");
+    //   return light;
+    // },
+  },
   data: () => ({}),
 };
 </script>
@@ -76,6 +92,10 @@ export default {
   width: 100%;
 }
 
+.response .box {
+  height: 100%;
+}
+
 .description {
   overflow-y: auto;
   justify-content: center;
@@ -98,6 +118,10 @@ export default {
   background-repeat: no-repeat;
   transition: var(--view-transition);
   box-shadow: inset 0 0 10px #000000;
+}
+
+.description .bg[data-light="false"] {
+  filter: brightness(5%) grayscale(100%);
 }
 
 .description .corpus {
@@ -139,7 +163,7 @@ export default {
 .response {
   height: 150px;
   overflow-y: auto;
-  border: 1px solid var(--tea-bg-3);
+  /* border: 1px solid var(--tea-bg-3); */
   background: var(--tea-bg-1);
 }
 

@@ -9,7 +9,10 @@ const store = {
   state: reactive({
     response: 'Command responses will display here when submitted.',
     more: false,
-    view: true
+    view: true,
+    lights: {
+      hallway: true
+    }
   }),
   atmospheres,
   scenes: {
@@ -45,7 +48,7 @@ const store = {
     if (scene.atmosphere) this.atmospheres.crossFade(scene.atmosphere);
   },
   playSimpleSoundEffects(attempt) {
-    console.log(attempt);
+    //console.log(attempt);
     const { action, actOnThings } = attempt;
     const [first] = actOnThings;
 

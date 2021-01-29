@@ -6,7 +6,8 @@
           v-bind:view="view"
           :scenes="scenes"
           :makeActionButton="makeActionButton"
-          :activeLocation="game.location"
+          :activeLocation="location"
+          :light="state.lights[game.location.key]"
         >
           <div class="titlebar full-width">
             <router-link to="/menu">Menu</router-link>
@@ -215,27 +216,5 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.content {
-  background: var(--tea-bg-3);
-}
-
-.titlebar {
-  display: flex;
-  padding: 0.5rem;
-  align-items: center;
-  border-bottom: 1px solid var(--tea-bg-2);
-}
-
-.titlebar .title-text {
-  flex-basis: 100%;
-}
-
-.titlebar .title-text.more {
-  display: flex;
-}
-
-button[aria-pressed="true"] {
-  text-decoration: underline;
-}
+<style>
 </style>

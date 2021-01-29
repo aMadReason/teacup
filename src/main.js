@@ -3,14 +3,15 @@ import { createWebHistory, createRouter } from "vue-router";
 import "./css/theme/index.css";
 import "./css/theme/helpers.css";
 import "./css/theme/themes/tea.css";
-import "./css/style.css";
-import App from "./App.vue";
+import "./css/style.css"
 
+import App from "./App.vue";
 import NotFoundPage from './pages/NotFoundPage';
 import IntroPage from './pages/IntroPage';
 import CreditsPage from './pages/CreditsPage';
 import MenuPage from './pages/MenuPage';
 import GamePage from './pages/GamePage';
+import ComputerPage from './pages/ComputerPage'
 
 // import UIGame from "./components/UIGame.vue";
 // import UICredits from "./components/UICredits.vue";
@@ -36,6 +37,7 @@ const routes = [
   { path: '/credits', name: 'credits', component: CreditsPage },
   { path: '/menu', name: 'menu', component: MenuPage },
   { path: '/game', name: 'game', component: GamePage },
+  { path: '/computer', name: 'computer', component: ComputerPage },
 ];
 
 const router = createRouter({

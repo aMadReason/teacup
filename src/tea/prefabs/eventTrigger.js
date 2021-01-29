@@ -1,9 +1,9 @@
 import Thing from '../Thing';
 import actions from '../actions';
 
-const defaultActs = [{ terms: ['use'], act: 'goTo' }];
+const defaultActs = [{ terms: ['use'], act: 'event' }];
 
-export function door(thingProps, options, acts = defaultActs) {
+export function eventTrigger(thingProps, options, acts = defaultActs) {
   const prefab = new Thing(thingProps);
 
   acts.map(a => {
@@ -16,7 +16,7 @@ export function door(thingProps, options, acts = defaultActs) {
   return prefab;
 }
 
-export default door;
+export default eventTrigger;
 
 
 
