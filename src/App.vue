@@ -26,7 +26,6 @@ const app = {
   },
   methods: {
     command(str) {
-      //const location = this.activeLocation;
       const attempt = this.game.command(str);
       const { lAttempt, pAttempt } = attempt;
       if (!str && !lAttempt && !pAttempt) return null;
